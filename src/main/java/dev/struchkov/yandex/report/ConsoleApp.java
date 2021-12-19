@@ -9,8 +9,11 @@ import dev.struchkov.yandex.report.service.MonthService;
 import dev.struchkov.yandex.report.service.Presentation;
 import dev.struchkov.yandex.report.service.YearService;
 
-import java.nio.file.Path;
+import java.time.Month;
 import java.util.List;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ConsoleApp {
 
@@ -21,7 +24,14 @@ public class ConsoleApp {
     private final MonthService monthService;
     private final Presentation presentation;
 
-    public ConsoleApp(YearScheduler yearScheduler, MontScheduler montScheduler, Accountant accountant, YearService yearService, MonthService monthService, Presentation presentation) {
+    public ConsoleApp(
+            YearScheduler yearScheduler,
+            MontScheduler montScheduler,
+            Accountant accountant,
+            YearService yearService,
+            MonthService monthService,
+            Presentation presentation
+    ) {
         this.yearScheduler = yearScheduler;
         this.montScheduler = montScheduler;
         this.accountant = accountant;
@@ -36,22 +46,47 @@ public class ConsoleApp {
             presentation.displayMenu();
             command = Integer.parseInt(presentation.userInput("Введите номер команды: "));
             switch (command) {
-                case 1 -> {
+                case 1:
                     yearScheduler.run();
                     montScheduler.run();
-                }
-                case 2 -> {
+                    break;
+                case 2:
+                    final Timer timer = new Timer();
+                    timer.schedule(
+                            new TimerTask() {
+                                @Override
+                                public void run() {
+                                    yearScheduler.run();
+                                }
+                            },
+                            0, 60_000
+                    );
+
+                    final Timer monthTimer = new Timer();
+                    monthTimer.schedule(
+                            new TimerTask() {
+                                @Override
+                                public void run() {
+                                    montScheduler.run();
+                                }
+                            },
+                            0, 60_000
+                    );
+                    break;
+
+                case 3:
                     final List<MonthReport> monthReports = monthService.generateAllMonthReport();
                     presentation.showMonthReport(monthReports);
-                }
-                case 3 -> {
+                    break;
+                case 4:
                     final List<YearReport> yearReports = yearService.generateAllYearReport();
                     presentation.showYearReport(yearReports);
-                }
-                case 4 -> {
+                    break;
+                case 5:
                     final String year = presentation.userInput("Введите год: ");
-                    accountant.dataReconciliation(Integer.parseInt(year));
-                }
+                    final Set<Month> months = accountant.dataReconciliation(Integer.parseInt(year));
+                    presentation.showResultDataReconciliation(months);
+                    break;
             }
         } while (command != 0);
 

@@ -16,4 +16,6 @@ public interface MonthRepository extends ReportRepository<MonthData> {
 
     List<MonthData> findByYear(Year year);
 
+    void clear(Year year, Month month);
+
 }

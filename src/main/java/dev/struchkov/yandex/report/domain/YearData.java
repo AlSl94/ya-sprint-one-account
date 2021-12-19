@@ -1,7 +1,5 @@
 package dev.struchkov.yandex.report.domain;
 
-import dev.struchkov.yandex.report.utils.MonthKey;
-
 import java.math.BigDecimal;
 import java.time.Month;
 import java.time.Year;
@@ -43,10 +41,6 @@ public class YearData {
 
     public void setExpense(boolean expense) {
         this.expense = expense;
-    }
-
-    public MonthKey getMontKey() {
-        return new MonthKey(month, year, expense);
     }
 
     @Override

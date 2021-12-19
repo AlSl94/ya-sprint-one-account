@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class AbstractScheduler<T> implements Runnable {
@@ -24,12 +25,15 @@ public abstract class AbstractScheduler<T> implements Runnable {
     private final ReportReadService<T> reportReadService;
     private final Map<String, String> md5Map = new HashMap<>();
 
-    public AbstractScheduler(
+    protected AbstractScheduler(
             String rootPath,
             String fileNamePattern,
             ReportService<T> reportService,
             ReportReadService<T> reportReadService
     ) {
+        if (rootPath == null || "".equalsIgnoreCase(rootPath)) {
+            throw new RuntimeException("В классе Main в конструкторе MontScheduler или YearScheduler укажите абсолютный путь до папки с отчетами");
+        }
         this.rootPath = rootPath;
         this.fileNamePattern = fileNamePattern;
         this.reportService = reportService;
@@ -44,7 +48,7 @@ public abstract class AbstractScheduler<T> implements Runnable {
             final List<Path> pathFiles = stream
                     .filter(filter::matches)
                     .filter(Files::isRegularFile)
-                    .toList();
+                    .collect(Collectors.toList());
             for (Path path : pathFiles) {
                 final String fileName = FileUtils.getFileName(path);
                 final String md5 = FileUtils.getFileChecksum(path);
@@ -52,8 +56,10 @@ public abstract class AbstractScheduler<T> implements Runnable {
                     final String saveMd5 = md5Map.get(fileName);
                     if (!saveMd5.equals(md5)) {
                         final List<T> reports = reportReadService.readReport(path);
-                        preProcessing(reports,fileName);
-                        reportService.updateAll(reports);
+                        preProcessing(reports, fileName);
+                        clearOld(fileName);
+                        reportService.createAll(reports);
+                        md5Map.put(fileName, md5);
                     }
                 } else {
                     md5Map.put(fileName, md5);
@@ -66,6 +72,8 @@ public abstract class AbstractScheduler<T> implements Runnable {
             System.err.println(e.getMessage());
         }
     }
+
+    protected abstract void clearOld(String fileName);
 
     protected abstract void preProcessing(List<T> report, String fileName);
 

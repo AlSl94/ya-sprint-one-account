@@ -6,7 +6,7 @@ import java.time.Year;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class YearReport {
+public class YearReport implements Comparable<YearReport> {
 
     /**
      * Год
@@ -26,22 +26,28 @@ public class YearReport {
     /**
      * Средний расход
      */
-    private final BigDecimal avgСonsumption;
+    private final BigDecimal avgConsumption;
 
-    public YearReport(Year year, Map<Month, BigDecimal> profit, BigDecimal avgIncome, BigDecimal avgСonsumption) {
+    public YearReport(Year year, Map<Month, BigDecimal> profit, BigDecimal avgIncome, BigDecimal avgConsumption) {
         this.year = year;
         this.profit = profit;
         this.avgIncome = avgIncome;
-        this.avgСonsumption = avgСonsumption;
+        this.avgConsumption = avgConsumption;
     }
 
     @Override
     public String toString() {
         return "Годовой отчет за " + year + ":\n" +
-                "Средний доход/расход -- " + avgIncome + "/" + avgСonsumption + "\n" +
+                "Средний доход/расход -- " + avgIncome + "/" + avgConsumption + "\n" +
                 profit.entrySet().stream()
                         .map(m -> m.getKey() + ": " + m.getValue())
                         .collect(Collectors.joining("\n"));
 
     }
+
+    @Override
+    public int compareTo(YearReport o) {
+        return this.year.compareTo(o.year);
+    }
+
 }

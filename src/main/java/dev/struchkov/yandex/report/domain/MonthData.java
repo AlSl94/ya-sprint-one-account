@@ -1,6 +1,6 @@
 package dev.struchkov.yandex.report.domain;
 
-import dev.struchkov.yandex.report.utils.MonthKey;
+import dev.struchkov.yandex.report.utils.YearAndMonth;
 
 import java.math.BigDecimal;
 import java.time.Month;
@@ -63,10 +63,6 @@ public class MonthData {
         this.sum = sum;
     }
 
-    public MonthKey getMontKey() {
-        return new MonthKey(month, year, expense);
-    }
-
     @Override
     public String toString() {
         return "MonthData{" +
@@ -78,4 +74,9 @@ public class MonthData {
                 ", sum=" + sum +
                 '}';
     }
+
+    public YearAndMonth getYearAndMonth() {
+        return new YearAndMonth(year, month);
+    }
+
 }

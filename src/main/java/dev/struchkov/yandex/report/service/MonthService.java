@@ -16,4 +16,6 @@ public interface MonthService extends ReportService<MonthData> {
 
     List<MonthData> getByYear(Year year);
 
+    void clear(Year year, Month month);
+
 }

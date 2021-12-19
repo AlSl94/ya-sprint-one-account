@@ -16,11 +16,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ReportYearServiceImpl implements YearService {
+public class YearServiceImpl implements YearService {
 
     public final YearRepository repository;
 
-    public ReportYearServiceImpl(YearRepository repository) {
+    public YearServiceImpl(YearRepository repository) {
         this.repository = repository;
     }
 
@@ -33,12 +33,7 @@ public class ReportYearServiceImpl implements YearService {
     public List<YearData> createAll(Collection<YearData> reports) {
         return reports.stream()
                 .map(this::create)
-                .toList();
-    }
-
-    @Override
-    public List<YearData> updateAll(Collection<YearData> reports) {
-        return createAll(reports);
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -75,7 +70,13 @@ public class ReportYearServiceImpl implements YearService {
         final Set<Year> years = repository.findAllYear();
         return years.stream()
                 .map(this::generateYearReport)
-                .toList();
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void clear(Year year) {
+        repository.clear(year);
     }
 
     public BigDecimal calculateAvg(List<YearData> yearDataList, boolean expense) {
@@ -83,7 +84,7 @@ public class ReportYearServiceImpl implements YearService {
                 .filter(yearData -> yearData.isExpense() == expense)
                 .map(YearData::getAmount)
                 .map(Objects::requireNonNull)
-                .toList();
+                .collect(Collectors.toList());
         return spending.stream()
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .divide(new BigDecimal(spending.size()), RoundingMode.valueOf(2));

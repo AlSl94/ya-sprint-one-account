@@ -12,4 +12,6 @@ public interface YearRepository extends ReportRepository<YearData> {
 
     Set<Year> findAllYear();
 
+    void clear(Year year);
+
 }

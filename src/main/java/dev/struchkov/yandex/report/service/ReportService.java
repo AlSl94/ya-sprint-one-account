@@ -9,6 +9,4 @@ public interface ReportService<T> {
 
     List<T> createAll(Collection<T> reports);
 
-    List<T> updateAll(Collection<T> reports);
-
 }

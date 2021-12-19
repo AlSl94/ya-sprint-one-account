@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MonthServiceImpl implements MonthService {
 
@@ -32,12 +33,7 @@ public class MonthServiceImpl implements MonthService {
     public List<MonthData> createAll(Collection<MonthData> collections) {
         return collections.stream()
                 .map(this::create)
-                .toList();
-    }
-
-    @Override
-    public List<MonthData> updateAll(Collection<MonthData> reports) {
-        return createAll(reports);
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -62,15 +58,22 @@ public class MonthServiceImpl implements MonthService {
                     .map(month -> generateMonthReport(year, month))
                     .filter(Optional::isPresent)
                     .map(Optional::get)
-                    .toList();
+                    .collect(Collectors.toList());
             monthReports.addAll(reports);
         }
-        return monthReports;
+        return monthReports.stream()
+                .sorted()
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<MonthData> getByYear(Year year) {
         return repository.findByYear(year);
+    }
+
+    @Override
+    public void clear(Year year, Month month) {
+        repository.clear(year, month);
     }
 
     private MonthReport.Pair getProductProfit(List<MonthData> monthDataList, boolean expense) {

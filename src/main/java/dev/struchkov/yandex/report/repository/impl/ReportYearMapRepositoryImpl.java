@@ -2,10 +2,11 @@ package dev.struchkov.yandex.report.repository.impl;
 
 import dev.struchkov.yandex.report.domain.YearData;
 import dev.struchkov.yandex.report.repository.YearRepository;
-import dev.struchkov.yandex.report.utils.MonthKey;
 
 import java.time.Year;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,11 +15,13 @@ import java.util.stream.Collectors;
 
 public class ReportYearMapRepositoryImpl implements YearRepository {
 
-    private final Map<MonthKey, YearData> map = new HashMap<>();
+    private final Map<Year, List<YearData>> map = new HashMap<>();
 
     @Override
     public YearData save(YearData yearData) {
-        map.put(yearData.getMontKey(), yearData);
+        final Year year = yearData.getYear();
+        map.computeIfAbsent(year, y -> new ArrayList<>());
+        map.get(year).add(yearData);
         return yearData;
     }
 
@@ -26,27 +29,32 @@ public class ReportYearMapRepositoryImpl implements YearRepository {
     public List<YearData> saveAll(Collection<YearData> collection) {
         return collection.stream()
                 .map(this::save)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<YearData> findAll() {
-        return map.values().stream().toList();
+        return map.values().stream()
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<YearData> findByYear(Year year) {
-        return map.keySet().stream()
-                .filter(monthKey -> monthKey.getYear().equals(year))
-                .map(map::get)
-                .toList();
+        if (map.containsKey(year)) {
+            return map.get(year);
+        }
+        return Collections.emptyList();
     }
 
     @Override
     public Set<Year> findAllYear() {
-        return map.keySet()
-                .stream().map(MonthKey::getYear)
-                .collect(Collectors.toUnmodifiableSet());
+        return map.keySet();
+    }
+
+    @Override
+    public void clear(Year year) {
+        map.remove(year);
     }
 
 }

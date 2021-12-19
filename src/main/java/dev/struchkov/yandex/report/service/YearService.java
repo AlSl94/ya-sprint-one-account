@@ -14,4 +14,6 @@ public interface YearService extends ReportService<YearData> {
 
     List<YearReport> generateAllYearReport();
 
+    void clear(Year year);
+
 }

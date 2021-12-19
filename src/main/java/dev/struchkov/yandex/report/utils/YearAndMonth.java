@@ -4,16 +4,14 @@ import java.time.Month;
 import java.time.Year;
 import java.util.Objects;
 
-public class MonthKey {
+public class YearAndMonth {
 
-    private final Month month;
     private final Year year;
-    private final boolean expense;
+    private final Month month;
 
-    public MonthKey(Month month, Year year, boolean expense) {
+    public YearAndMonth(Year year, Month month) {
         this.month = month;
         this.year = year;
-        this.expense = expense;
     }
 
     public Month getMonth() {
@@ -24,21 +22,17 @@ public class MonthKey {
         return year;
     }
 
-    public boolean isExpense() {
-        return expense;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MonthKey monthKey = (MonthKey) o;
-        return expense == monthKey.expense && month == monthKey.month && year.equals(monthKey.year);
+        YearAndMonth yearAndMonth = (YearAndMonth) o;
+        return month == yearAndMonth.month && Objects.equals(year, yearAndMonth.year);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(month, year, expense);
+        return Objects.hash(month, year);
     }
 
 }
